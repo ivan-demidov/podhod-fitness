@@ -356,6 +356,14 @@ input[type=date]::-webkit-date-and-time-value { text-align: left; min-height: 1.
 .dialog-content [data-slot=dialog-header] { text-align: left; padding-right: 34px; }
 .dialog-content [data-slot=dialog-title] { font-size: 1.2rem; line-height: 1.22; }
 .dialog-content [data-slot=dialog-close] { min-width: 44px; min-height: 44px; top: 5px; right: 5px; display: grid; place-items: center; border-radius: 10px; color: var(--foreground); }
+.dialog-content[data-placement=bottom] {
+  inset: auto 0 0;
+  max-height: calc(100dvh - max(16px, env(safe-area-inset-top, 0px)));
+  padding-inline: max(20px, env(safe-area-inset-left, 0px)) max(20px, env(safe-area-inset-right, 0px));
+  padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  border-radius: 20px 20px 0 0;
+}
+.dialog-content[data-placement=bottom] [data-slot=dialog-close] { right: max(5px, env(safe-area-inset-right, 0px)); }
 .toast-slot { position: fixed; z-index: 90; inset: auto 16px calc(16px + var(--nav-offset)) auto; pointer-events: none; display: grid; gap: 3px; justify-items: end; max-width: calc(100% - 32px); }
 .toast { padding: 10px 14px; border-radius: 12px; background: var(--primary); color: var(--primary-foreground); font-size: .9rem; box-shadow: 0 5px 24px #0002; font-weight: 620; }
 .toast-error { border: 1px solid var(--destructive); background: var(--card); color: var(--destructive); }
@@ -414,7 +422,6 @@ input[type=date]::-webkit-date-and-time-value { text-align: left; min-height: 1.
   .stat-card > span { font-size: .81rem; }
   .meal-grid { grid-template-columns: minmax(0, 1fr); gap: 9px; }
   .macro-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .dialog-content.mobile-sheet[data-slot=dialog-content] { top: auto; bottom: 0; left: 0; transform: none; translate: 0; width: 100%; max-width: 100%; border-radius: 20px 20px 0 0; padding-bottom: max(21px, env(safe-area-inset-bottom)); }
   .diary-entry:has(.sticky-submit) { padding-bottom: 18px; }
   .main:has(.sticky-submit) { padding-bottom: calc(var(--nav-offset) + 82px); }
   .sticky-submit { position: fixed; z-index: 34; bottom: max(var(--nav-offset), var(--keyboard-inset, 0px)); inset-inline: 0; background: var(--background); border-top: 1px solid var(--border); padding: 5px max(16px, env(safe-area-inset-right)) 5px max(16px, env(safe-area-inset-left)); }

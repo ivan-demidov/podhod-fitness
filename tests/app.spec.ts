@@ -168,11 +168,6 @@ test('проверка кэша, перезапуска без сети, нав�
 
 test('все разделы вмещаются в экран, навигация и контраст', async ({ page }) => {
   await visit(page)
-  if (await page.getByRole('button', { name: 'Ещё' }).isVisible()) {
-    await page.getByRole('button', { name: 'Ещё' }).click()
-    await page.getByRole('dialog').getByRole('link', { name: 'Профиль' }).click()
-    await expect(page.getByRole('heading', { name: 'Профиль', exact: true })).toBeVisible()
-  }
   for (const section of ['today', 'training', 'diary', 'progress', 'nutrition', 'knowledge', 'profile']) {
     await visit(page, section)
     await expect(page.locator('h1')).toBeVisible()
@@ -185,4 +180,37 @@ test('все разделы вмещаются в экран, навигация
       expect(results.violations.map(v => ({ id: v.id, nodes: v.nodes.map(n => n.target) }))).toEqual([])
     }
   }
+})
+
+test('меню «Ещё» целиком видно у нижнего края и открывает все разделы', async ({ page }) => {
+  await page.emulateMedia({ colorScheme: 'dark' })
+  await page.setViewportSize({ width: 440, height: 956 })
+  await visit(page, 'progress')
+  await expect(page.getByRole('heading', { name: 'Прогресс', exact: true })).toBeVisible()
+  const trigger = page.getByRole('button', { name: 'Ещё', exact: true })
+  const menu = page.getByRole('dialog', { name: 'Разделы' })
+
+  for (const [width, height] of [[440, 956], [320, 640], [740, 340]]) {
+    await page.setViewportSize({ width, height })
+    await trigger.click()
+    await expect(menu).toBeVisible()
+    await expect.poll(() => menu.evaluate(el => {
+      const { left, right, top, bottom } = el.getBoundingClientRect()
+      return left >= -1 && right <= innerWidth + 1 && top >= 0 && Math.abs(bottom - innerHeight) <= 1
+    })).toBe(true)
+    await menu.getByRole('button', { name: 'Закрыть', exact: true }).click()
+    await expect(menu).toHaveCount(0)
+    await expect(trigger).toBeFocused()
+  }
+
+  for (const title of ['Питание', 'Добавки и знания', 'Профиль']) {
+    await trigger.click()
+    await menu.getByRole('link', { name: title, exact: true }).click()
+    await expect(page.getByRole('heading', { name: title, exact: true })).toBeVisible()
+    await expect(menu).toHaveCount(0)
+  }
+  await trigger.click()
+  await page.keyboard.press('Escape')
+  await expect(menu).toHaveCount(0)
+  await expect(trigger).toBeFocused()
 })

@@ -2,7 +2,7 @@ import { lazy, Suspense, useEffect, useRef, useState, type ChangeEvent, type Mou
 import { registerSW } from 'virtual:pwa-register'
 import { Activity, BookOpen, ClipboardList, Dumbbell, House, LayoutGrid, Moon, Sun, TrendingUp, Upload, UserRound, Utensils } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Today } from '@/components/today'
 import { Training } from '@/components/training-view'
 import { Diary } from '@/components/diary'
@@ -201,14 +201,16 @@ export default function App() {
       </div>
       </Suspense>
     </main>
-    <nav className="mobile-tabs" aria-label="Основные разделы">
-      {pages.slice(0, 4).map(p => <a key={p.id} href={`#${p.id}`} onClick={e => interceptHash(e, p.id)} aria-current={page === p.id ? 'page' : undefined}>
-        <p.icon aria-hidden="true" size={22} /><span>{p.id === 'training' ? 'План' : p.title}</span>
-      </a>)}
-      <button type="button" className={cn(!pages.slice(0, 4).some(p => p.id === page) && 'is-active')} aria-expanded={menuOpen} onClick={() => setMenuOpen(true)}><LayoutGrid size={22} aria-hidden="true" /><span>Ещё</span></button>
-    </nav>
     <Dialog open={menuOpen} onOpenChange={setMenuOpen}>
-      <DialogContent className="dialog-content mobile-sheet">
+      <nav className="mobile-tabs" aria-label="Основные разделы">
+        {pages.slice(0, 4).map(p => <a key={p.id} href={`#${p.id}`} onClick={e => interceptHash(e, p.id)} aria-current={page === p.id ? 'page' : undefined}>
+          <p.icon aria-hidden="true" size={22} /><span>{p.id === 'training' ? 'План' : p.title}</span>
+        </a>)}
+        <DialogTrigger asChild>
+          <button type="button" className={cn(!pages.slice(0, 4).some(p => p.id === page) && 'is-active')}><LayoutGrid size={22} aria-hidden="true" /><span>Ещё</span></button>
+        </DialogTrigger>
+      </nav>
+      <DialogContent placement="bottom" className="dialog-content">
         <DialogHeader><DialogTitle>Разделы</DialogTitle><DialogDescription>Питание, знания и настройки.</DialogDescription></DialogHeader>
         {pages.slice(4).map(p => <a key={p.id} className="sheet-link" href={`#${p.id}`} aria-current={page === p.id ? 'page' : undefined} onClick={e => interceptHash(e, p.id)}><p.icon size={23} aria-hidden="true" />{p.title}</a>)}
       </DialogContent>
