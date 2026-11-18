@@ -107,6 +107,11 @@ export function Progress({ data, update, openNew = false }: { data: Data; update
   const delta = recentValues.length >= 2 && beforeValues.length >= 2 ? average(recentValues) - average(beforeValues) : undefined
   const unit = metric === 'weight' ? 'кг' : 'см'
 
+  function closeMeasure() {
+    setEditing(null)
+    if (location.hash === '#progress/new') location.replace('#progress')
+  }
+
   return <>
     <PageHeader title="Прогресс" text="Замеры и рабочие результаты за разные даты."
       action={<Button onClick={() => setEditing('new')}><Plus aria-hidden="true" /> Добавить замер</Button>} />
@@ -152,7 +157,7 @@ export function Progress({ data, update, openNew = false }: { data: Data; update
         </div>)}
       </section>
     </div>
-    <Dialog open={editing !== null} onOpenChange={open => { if (!open) setEditing(null) }}>
+    <Dialog open={editing !== null} onOpenChange={open => { if (!open) closeMeasure() }}>
       {editing && <DialogContent className="dialog-content">
         <DialogHeader><DialogTitle>{editing === 'new' ? 'Новый замер' : 'Редактировать замер'}</DialogTitle>
           <DialogDescription>Можно записать вес, талию или оба значения.</DialogDescription></DialogHeader>
@@ -162,7 +167,7 @@ export function Progress({ data, update, openNew = false }: { data: Data; update
             const combined = { ...sameDate, ...m, weight: m.weight ?? sameDate?.weight, waist: m.waist ?? sameDate?.waist }
             return { ...d, measures: [...d.measures.filter(x => x.id !== m.id && x.date !== m.date), combined] }
           }, 'Замер сохранён')
-          if (ok) setEditing(null)
+          if (ok) closeMeasure()
           return ok
         }} />
       </DialogContent>}

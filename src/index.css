@@ -390,7 +390,8 @@ input[type=date]::-webkit-date-and-time-value { text-align: left; min-height: 1.
   .page-description { font-size: .92rem; line-height: 1.49; margin-top: 6px; }
   .setup-banner { gap: 9px; padding: 10px 11px; }
   .setup-banner p { font-size: .78rem; }
-  .setup-banner > [data-slot=button] { flex: none; max-width: 46%; text-align: left; font-size: .8rem; }
+  .setup-banner > [data-slot=button] { flex: none; max-width: 46%; text-align: center; font-size: .8rem; padding-inline: 8px; }
+  .setup-banner > [data-slot=button] svg { display: none; }
   .workout-hero { min-height: 290px; background-position: center, 55% center; }
   .workout-hero h2 { font-size: clamp(1.85rem, 8vw, 3.05rem); }
   .dashboard-grid, .training-layout, .diary-layout, .progress-grid, .profile-grid, .knowledge-grid { grid-template-columns: minmax(0, 1fr); gap: 12px; }

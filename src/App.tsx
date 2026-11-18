@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ChangeEvent, type MouseEvent } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState, type ChangeEvent, type MouseEvent } from 'react'
 import { registerSW } from 'virtual:pwa-register'
 import { Activity, BookOpen, ClipboardList, Dumbbell, House, LayoutGrid, Moon, Sun, TrendingUp, Upload, UserRound, Utensils } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -6,13 +6,14 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Today } from '@/components/today'
 import { Training } from '@/components/training-view'
 import { Diary } from '@/components/diary'
-import { Progress } from '@/components/progress'
-import { Nutrition } from '@/components/nutrition-view'
-import { Knowledge } from '@/components/knowledge-view'
 import { ProfileView } from '@/components/profile'
 import { listenStorage, localDay, mergeImport, newId, parseImport, persist, readData, type Data, type Import } from '@/lib/data'
 import { type Day } from '@/lib/training'
 import { cn } from '@/lib/utils'
+
+const Progress = lazy(() => import('@/components/progress').then(module => ({ default: module.Progress })))
+const Nutrition = lazy(() => import('@/components/nutrition-view').then(module => ({ default: module.Nutrition })))
+const Knowledge = lazy(() => import('@/components/knowledge-view').then(module => ({ default: module.Knowledge })))
 
 const pages = [
   { id: 'today', title: 'Сегодня', icon: House },
@@ -188,6 +189,7 @@ export default function App() {
     <main className="main">
       {!online && <div className="network-status"><span className="neutral-dot" /> Офлайн · записи сохраняются локально</div>}
       {snapshot.error && <div role="alert" className="warning-banner">{snapshot.error}</div>}
+      <Suspense fallback={<div className="view panel" role="status">Загружаю раздел…</div>}>
       <div className="view" key={page}>
         {page === 'today' && <Today data={data} start={openDay} firstRun={openImport} />}
         {page === 'training' && <Training data={data} start={openDay} setPlan={plan => update(d => ({ ...d, settings: { ...d.settings, plan } }))} />}
@@ -197,6 +199,7 @@ export default function App() {
         {page === 'knowledge' && <Knowledge profile={data.profile} />}
         {page === 'profile' && <ProfileView data={data} update={update} requestImport={openImport} offline={offlineReady} />}
       </div>
+      </Suspense>
     </main>
     <nav className="mobile-tabs" aria-label="Основные разделы">
       {pages.slice(0, 4).map(p => <a key={p.id} href={`#${p.id}`} onClick={e => interceptHash(e, p.id)} aria-current={page === p.id ? 'page' : undefined}>
