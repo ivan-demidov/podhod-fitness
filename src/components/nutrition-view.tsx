@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Calculator, ChevronRight, ShoppingBasket, Utensils, Wheat } from 'lucide-react'
 import { Button } from './ui/button'
 import { Disclosure, PageHeader } from './common'
-import { foods, mealLabels, menu, nutrition, shopping, targets } from '@/lib/nutrition'
+import { cappuccino, foods, mealLabels, menu, nutrition, shopping, targets } from '@/lib/nutrition'
 import { type Data } from '@/lib/data'
 
 const num = (x: number) => Math.round(x).toLocaleString('ru-RU')
@@ -18,7 +18,7 @@ export function Nutrition({ data, toggle }: { data: Data; toggle(id: string): vo
   const target = profile ? targets(profile) : undefined
 
   return <>
-    <PageHeader title="Питание" text="Ориентиры на день и меню на семь дней." />
+    <PageHeader title="Питание" text="Меню на неделю, рецепты и список покупок." />
     <section className="panel nutrition-target">
       <div className="between"><h2>Твой дневной ориентир</h2><Calculator className="muted" size={21} aria-hidden="true" /></div>
       {target && profile ? <>
@@ -37,6 +37,7 @@ export function Nutrition({ data, toggle }: { data: Data; toggle(id: string): vo
         <p>Дай стартовым порциям 2–3 недели. Если вес и талия стоят при стабильном режиме, уменьши рацион примерно на 100–150 ккал или немного добавь ходьбы. При снижении быстрее 0,5 кг в неделю две недели подряд или падении сил и ухудшении восстановления добавь 100–150 ккал. Меняй один фактор за раз. Через 6–8 недель оцени динамику и при необходимости перейди на поддержание.</p>
         <p>Жир уходит с тела в индивидуальном порядке. Упражнения на пресс укрепляют мышцы живота. Талия и силовые показатели помогут оценить прогресс вместе.</p>
       </Disclosure>
+      <a className="text-link" href="#knowledge">Схема приёма добавок <ChevronRight size={16} aria-hidden="true" /></a>
     </section>
 
     <div className="section-bar nutrition-switch">
@@ -52,31 +53,39 @@ export function Nutrition({ data, toggle }: { data: Data; toggle(id: string): vo
         <div className="subtle-pill"><Wheat size={16} aria-hidden="true" /> {num(total.fiber)} г клетчатки</div>
       </div>
       <p className="menu-totals">{num(total.kcal)} ккал · Б {num(total.protein)} г · Ж {num(total.fat)} г · У {num(total.carbs)} г</p>
+      <div className="callout coffee-note">
+        <strong>Капучино 350 мл уже входит в завтрак и итог дня</strong>
+        <p>В расчёте {cappuccino.milkGrams} г молока 2,5% и около {cappuccino.espressoMl} мл эспрессо, без сахара и сиропа. Получается ≈ {cappuccino.kcal} ккал. В кофейне ориентируйся на данные для своей порции: рецепт может отличаться.</p>
+      </div>
       <div className="meal-grid">
         {day.meals.map((m, i) => {
           const t = nutrition(m.items)
           return <section key={i} className="panel meal-card">
             <div className="between"><span className="eyebrow">{mealLabels[i]}</span><strong className="meal-kcal">{num(t.kcal)} ккал</strong></div>
             <h3>{m.name}</h3>
-            <ul>{m.items.map(([id, grams]) => <li key={id}><span>{foods[id].label}</span><strong>{grams} г</strong></li>)}</ul>
+            <ul>{m.items.map(([id, amount]) => <li key={id}><span>{foods[id].label}</span><strong>{amount} {id === 'cappuccino' ? 'мл' : 'г'}</strong></li>)}</ul>
+            <Disclosure title="Как приготовить">
+              <ol className="instruction-list">{m.steps.map(step => <li key={step}>{step}</li>)}</ol>
+            </Disclosure>
           </section>
         })}
       </div>
-      <p className="muted caption">Крупы и чечевица указаны сухими, мясо и картофель — сырыми. Масло включено. Для остальных продуктов указан вес съедобной части. Калории и БЖУ округлены.</p>
+      <p className="muted caption">Крупы и чечевица указаны сухими, мясо и картофель — сырыми. Масло включено. Для остальных продуктов указан вес съедобной части, для капучино — объём готового напитка. Калории и БЖУ округлены.</p>
     </> : <section className="panel">
       <div className="between"><h2>Список на неделю</h2><span className="subtle-pill">{shopping.filter(f => data.settings.shopping.includes(f.id)).length} / {shopping.length}</span></div>
-      <p className="muted">Количество рассчитано из меню на одного человека. Для покупки округли до упаковки и учти потери при очистке.</p>
+      <p className="muted">Количество рассчитано из меню на одного человека. Для покупки округли до упаковки и учти потери при очистке. Для домашнего капучино добавь к молоку из списка ещё 1,75 кг молока 2,5% на неделю и кофе на 7 порций эспрессо.</p>
       {portions.map(category => <div className="shopping-group" key={category}><h3>{category}</h3>
         {shopping.filter(f => f.category === category).map(f => <label className="shopping-line" key={f.id}>
           <input type="checkbox" checked={data.settings.shopping.includes(f.id)} onChange={() => toggle(f.id)} />
-          <span>{f.label}</span><strong>{f.grams >= 1000 ? `${(f.grams / 1000).toLocaleString('ru-RU', { maximumFractionDigits: 2 })} кг` : `${f.grams} г`}</strong>
+          <span>{f.label}</span><strong>{f.id === 'cappuccino' ? `${f.amount / cappuccino.ml} × ${cappuccino.ml} мл` : f.amount >= 1000 ? `${(f.amount / 1000).toLocaleString('ru-RU', { maximumFractionDigits: 2 })} кг` : `${f.amount} г`}</strong>
         </label>)}
       </div>)}
     </section>}
     <section className="panel guides">
       <h2>Готовка и замены</h2>
       <Disclosure title="Заготовки на 2–3 дня">
-        <p>Готовь крупы и мясо отдельными порциями. Курицу, индейку и картофель можно запекать, фарш — тушить с овощами, чечевицу — варить до мягкости. Овощи подойдут свежие или замороженные без добавок. Разложи готовое по порциям, охлади сразу после приготовления, часть можно заморозить.</p>
+        <p>Готовь крупы и мясо отдельными порциями. Курицу, индейку и картофель можно запекать, фарш — тушить с овощами, чечевицу — варить до мягкости. Овощи подойдут свежие или замороженные без добавок. Разложи готовое по порциям, быстро охлади и убери в холодильник. Часть можно заморозить. Температуру мяса проверяй термометром в толще продукта.</p>
+        <p><a href="https://www.foodsafety.gov/food-safety-charts/safe-minimum-internal-temperatures" target="_blank" rel="noreferrer">Безопасные температуры приготовления</a></p>
       </Disclosure>
       <Disclosure title="Простые замены">
         <p>Курица и индейка обычно взаимозаменяемы грамм к грамму. 70 г сухой крупы близки по энергии к 300–330 г сырого картофеля. 150 г творога 5% примерно соответствуют по белку 250–270 г указанного йогурта 2%, сверяй этикетку. Брокколи можно заменить капустой, ягоды — фруктом. При замене орехов из-за аллергии используй только переносимые продукты, а калории и БЖУ проверь отдельно.</p>

@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { Activity, ArrowRight, Clock3, Dumbbell } from 'lucide-react'
-import { Disclosure, PageHeader } from './common'
+import { Disclosure, Field, PageHeader } from './common'
 import { Button } from './ui/button'
 import { dose, exerciseProgression, exercises, optionalDays, plans, weekdays, type Day, type Slot } from '@/lib/training'
-import { ramping, type Data } from '@/lib/data'
+import { ramping, type Data, type Settings } from '@/lib/data'
 import { safety, sources } from '@/lib/knowledge'
 
 export function ExerciseDetail({ slot, ramp, past }: { slot: Slot; ramp: boolean; past?: string }) {
@@ -31,7 +31,7 @@ export function ExerciseDetail({ slot, ramp, past }: { slot: Slot; ramp: boolean
   </div>
 }
 
-export function Training({ data, setPlan, start }: { data: Data; setPlan(value: 3 | 4): void; start(day: Day): void }) {
+export function Training({ data, setPlan, setVolume, start }: { data: Data; setPlan(value: 3 | 4): void; setVolume(value: Settings['trainingVolume']): void; start(day: Day): void }) {
   const [dayId, setDayId] = useState('')
   const plan = plans[data.settings.plan]
   const selected = [...plan, ...optionalDays].find(d => d.id === dayId) ?? plan[0]
@@ -44,6 +44,20 @@ export function Training({ data, setPlan, start }: { data: Data; setPlan(value: 
       </div>
       <span className="subtle-pill"><Activity size={16} aria-hidden="true" /> {ramp ? 'Возврат к нагрузке' : 'Рабочий объём'}</span>
     </div>
+    <section className="panel volume-panel" aria-label="Этап нагрузки">
+      <div>
+        <h2>Этап нагрузки</h2>
+        <p>{ramp ? 'Возврат после паузы. До 2 рабочих подходов на упражнение, 3–4 повтора в запасе.' : 'Обычная нагрузка. 3 рабочих подхода на главных движениях, 2–3 на дополнительных, 2–3 повтора в запасе.'}</p>
+        {data.settings.trainingVolume === 'auto' && <p className="caption">Авто ориентируется на завершённые занятия в дневнике. Если уже регулярно тренируешься и восстанавливаешься, выбери «Рабочий объём».</p>}
+      </div>
+      <Field label="Режим подходов">
+        <select value={data.settings.trainingVolume} onChange={e => setVolume(e.currentTarget.value as Settings['trainingVolume'])}>
+          <option value="auto">Авто по дневнику</option>
+          <option value="ramp">Возврат после паузы</option>
+          <option value="working">Рабочий объём</option>
+        </select>
+      </Field>
+    </section>
     <div className="training-layout">
       <div className="training-days">
         {plan.map((d, i) => <button key={d.id} type="button" className="day-chip" aria-pressed={selected.id === d.id} onClick={() => setDayId(d.id)}>
@@ -59,7 +73,7 @@ export function Training({ data, setPlan, start }: { data: Data; setPlan(value: 
         </Disclosure>
         {selected.slots.map((slot, i) => {
           const ex = exercises[slot.exercise]
-          return <Disclosure key={selected.id + slot.exercise} title={<span className="exercise-heading"><span className="step-index">{String(i + 1).padStart(2, '0')}</span><span><strong>{ex.name}</strong><small>{ramp ? slot.startSets : slot.sets} × {dose(ex)}</small></span></span>}>
+          return <Disclosure key={selected.id + slot.exercise} title={<span className="exercise-heading"><span className="step-index">{String(i + 1).padStart(2, '0')}</span><span><strong>{ex.name}</strong><small>{ramp ? slot.startSets : slot.sets} × {dose(ex)}{ramp && slot.startSets !== slot.sets ? ` · рабочий объём: ${slot.sets} подхода` : ''}</small></span></span>}>
             <ExerciseDetail slot={slot} ramp={ramp} past={data.profile?.pastLifts?.[slot.exercise]} />
           </Disclosure>
         })}
@@ -78,8 +92,14 @@ export function Training({ data, setPlan, start }: { data: Data; setPlan(value: 
     <section className="panel guides">
       <h2>Как тренироваться</h2>
       <Disclosure title="Возврат после паузы и пропущенные дни">
-        <p>Первые две недели — до двух рабочих подходов на упражнение, 3–4 повторения в запасе (RIR). Начни с трёх дней. Затем добавь прописанный объём при устойчивом самочувствии и нормальном восстановлении. Четыре дня можно выбрать после адаптации. При перерыве от двух недель приложение снова покажет лёгкий объём.</p>
+        <p>После паузы начни с трёх дней и до двух рабочих подходов на упражнение примерно на 1–2 недели. Оставляй 3–4 повторения в запасе (RIR). Если нормально восстанавливаешься и техника стабильна, переходи на рабочий объём. Две недели — ориентир программы. В автоматическом режиме лёгкий этап включается при пустом дневнике, на первые 14 дней после старта или после паузы от 14 дней. Вручную можно выбрать любой этап.</p>
         <p>Пропустил день — продолжи с ближайшей незавершённой тренировки по порядку. Три дня обычно разделяй хотя бы сутками. В четырёхдневной схеме дни подряд чередуют верх и низ. Оставь примерно 48 часов до следующей нагрузки на ту же группу. Не объединяй два дня в один.</p>
+      </Disclosure>
+      <Disclosure title="Почему по два подхода на старте">
+        <p>ACSM (2026) рекомендует здоровым взрослым как минимум два подхода на упражнение. Для силы прибавка от дополнительных подходов после 2–3 на упражнение в среднем уменьшается. Для роста мышц важнее недельный объём: в обзорах преимущество чаще наблюдали примерно от 10 подходов на мышечную группу в неделю. Это средний ориентир, и жимы с тягами частично нагружают руки и плечи.</p>
+        <p>Два подхода дают нагрузку на этапе возвращения. Когда обычные тренировки не мешают восстановлению, переходи на рабочие 3 подхода в приоритетных упражнениях. В дефиците энергии рост мышечной массы обычно замедляется. Стабильные или растущие рабочие веса тоже показывают прогресс.</p>
+        <p><a href={sources[0].url} target="_blank" rel="noreferrer">Позиция ACSM, 2026</a></p>
+        <p><a href={sources.find(source => source.id === 'deficit')?.url} target="_blank" rel="noreferrer">Метаанализ силовых тренировок в дефиците, 2022</a></p>
       </Disclosure>
       <Disclosure title="Сила, плечи и руки">
         <p>Начинай с главного движения, когда ещё свеж. После адаптации держи в главном жиме 6–8 повторений, в остальных базовых движениях обычно 8–12. Отдыхай до 2–3 минут, если дыхание и техника ещё не восстановились.</p>

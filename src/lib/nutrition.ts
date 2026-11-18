@@ -2,7 +2,11 @@ const food = (
   label: string, category: string, kcal: number, protein: number, fat: number, carbs: number, fiber = 0,
 ) => ({ label, category, kcal, protein, fat, carbs, fiber })
 
+export const cappuccino = { ml: 350, milkGrams: 250, espressoMl: 30, kcal: 133, protein: 7.5, fat: 6.25, carbs: 12.25 }
+const per100ml = 100 / cappuccino.ml
+
 export const foods = {
+  cappuccino: food('Капучино без сахара', 'Напитки', cappuccino.kcal * per100ml, cappuccino.protein * per100ml, cappuccino.fat * per100ml, cappuccino.carbs * per100ml),
   oats: food('Овсяные хлопья, сухие', 'Крупы и хлеб', 370, 13, 7, 62, 10),
   rice: food('Рис, сухой', 'Крупы и хлеб', 360, 7, 1, 79, 1),
   buckwheat: food('Гречка, сухая', 'Крупы и хлеб', 343, 13, 3.4, 72, 10),
@@ -38,39 +42,92 @@ export const foods = {
 }
 type FoodId = keyof typeof foods
 type Ingredient = [FoodId, number]
-type Meal = { name: string; items: Ingredient[] }
-const meal = (name: string, ...items: Ingredient[]): Meal => ({ name, items })
+type Meal = { name: string; steps: string[]; items: Ingredient[] }
+const meal = (name: string, steps: string[], ...items: Ingredient[]): Meal => ({ name, steps, items })
 
-const oatBowl = meal('Овсянка, йогурт и банан', ['oats', 65], ['milk', 200], ['yogurt', 170], ['banana', 120], ['flax', 10])
-const toastEgg = meal('Яйца, тосты и овощи', ['egg', 150], ['bread', 90], ['tomato', 150], ['cheese', 25], ['orange', 160])
-const cottageBowl = meal('Творог с ягодами и хлебом', ['cottage', 180], ['berries', 150], ['bread', 60], ['walnuts', 15], ['honey', 10])
-const chickenRice = meal('Курица с рисом и брокколи', ['chicken', 160], ['rice', 80], ['broccoli', 180], ['carrot', 80], ['oil', 8])
-const turkeyGrain = meal('Индейка с гречкой и салатом', ['turkey', 180], ['buckwheat', 85], ['cucumber', 140], ['pepper', 100], ['oil', 15])
-const beefPasta = meal('Макароны с говядиной и томатами', ['pasta', 90], ['beef', 150], ['tomato', 180], ['zucchini', 120], ['oil', 5])
-const bakedChicken = meal('Запечённая курица с картофелем', ['chicken', 200], ['potato', 350], ['cabbage', 150], ['carrot', 80], ['oil', 13])
-const turkeyLentil = meal('Тушёная индейка с чечевицей', ['turkey', 120], ['lentils', 67], ['carrot', 100], ['tomato', 160], ['oil', 14], ['bread', 30])
-const beefRice = meal('Говядина с рисом и перцем', ['beef', 150], ['rice', 85], ['pepper', 150], ['zucchini', 100], ['oil', 5])
-const chickpeaPlate = meal('Тёплый салат с нутом и индейкой', ['turkey', 145], ['beans', 160], ['potato', 200], ['pepper', 120], ['cucumber', 100], ['oil', 12])
-const cottageSnack = meal('Творог, яблоко и орехи', ['cottage', 150], ['apple', 180], ['walnuts', 18])
-const yogurtSnack = meal('Йогурт, банан и орехи', ['yogurt', 220], ['banana', 120], ['walnuts', 20])
-const kefirSnack = meal('Кефир, яблоко и тост с сыром', ['kefir', 250], ['apple', 170], ['bread', 45], ['cheese', 25])
-const cottageOrange = meal('Творог, апельсин и орехи', ['cottage', 130], ['orange', 180], ['walnuts', 18])
+const oatBowl = meal('Овсянка, йогурт и банан', [
+  'Смешай 120 г молока из списка со 100–120 мл воды и нагрей почти до кипения.',
+  'Всыпь хлопья, убавь огонь и вари, помешивая, по инструкции на упаковке. Если загустело слишком сильно, долей немного воды.',
+  'Переложи в миску, дай чуть остыть. После варки добавь йогурт, нарезанный банан и молотый лён сверху.',
+], ['oats', 55], ['milk', 120], ['yogurt', 170], ['banana', 100], ['flax', 10])
+const toastEgg = meal('Омлет, тосты и овощи', [
+  'Взбей яйца вилкой со щепоткой соли. Вылей на антипригарную сковороду и готовь на слабом огне под крышкой, пока яйца полностью не схватятся.',
+  'Подсуши хлеб. Положи сыр на тосты и подай их с омлетом и нарезанными томатами. Апельсин съешь отдельно.',
+], ['egg', 150], ['bread', 70], ['tomato', 150], ['cheese', 20], ['orange', 160])
+const cottageBowl = meal('Творог с ягодами и тостом', [
+  'Разморозь ягоды по инструкции на упаковке. В миске смешай творог с ягодами и мёдом, сверху добавь измельчённые орехи.',
+  'Подсуши хлеб и съешь его отдельно вместе с творогом.',
+], ['cottage', 180], ['berries', 150], ['bread', 45], ['walnuts', 10], ['honey', 5])
+const chickenRice = meal('Курица с рисом и брокколи', [
+  'Промой рис и отвари по инструкции на упаковке. Брокколи и нарезанную морковь приготовь на пару 6–10 минут до нужной мягкости.',
+  'Нарежь курицу кубиками и приготовь с указанным маслом на сковороде, переворачивая кусочки. Внутри курицы должно быть 74 °C. Подай с рисом и овощами.',
+], ['chicken', 160], ['rice', 70], ['broccoli', 180], ['carrot', 80], ['oil', 8])
+const turkeyGrain = meal('Индейка с гречкой и салатом', [
+  'Промой гречку, залей водой примерно 1:2 по объёму, вари под крышкой около 15–20 минут до впитывания воды.',
+  'Нарежь филе индейки полосками. Часть масла используй для сковороды и доведи мясо до 74 °C внутри.',
+  'Нарежь огурец и перец, заправь оставшимся маслом. Подай салат отдельно от гречки с индейкой.',
+], ['turkey', 180], ['buckwheat', 80], ['cucumber', 140], ['pepper', 100], ['oil', 15])
+const beefPasta = meal('Макароны с говядиной и томатами', [
+  'Поставь макароны вариться по инструкции. Нарежь кабачок и томаты кубиками.',
+  'Разогрей масло, разбей фарш лопаткой и готовь, пока он не достигнет 71 °C внутри. Добавь кабачок и томаты, туши 8–12 минут. При необходимости долей немного воды.',
+  'Слей воду с макарон и смешай их с мясным соусом прямо на сковороде.',
+], ['pasta', 80], ['beef', 150], ['tomato', 180], ['zucchini', 120], ['oil', 5])
+const bakedChicken = meal('Запечённая курица с картофелем', [
+  'Разогрей духовку до 200 °C. Нарежь картофель дольками, перемешай с частью масла и поставь запекаться.',
+  'Через 10 минут выложи рядом курицу. Запекай до мягкости картофеля и 74 °C в самой толстой части грудки. Время зависит от её толщины.',
+  'Нашинкуй капусту, натри морковь и заправь оставшимся маслом. Подай салат к курице и картофелю.',
+], ['chicken', 200], ['potato', 325], ['cabbage', 150], ['carrot', 80], ['oil', 13])
+const turkeyLentil = meal('Тушёная индейка с чечевицей', [
+  'Промой чечевицу и отвари до мягкости по инструкции на упаковке.',
+  'Нарежь индейку и морковь, обжарь на указанном масле, добавь нарезанные томаты и немного воды. Туши до мягкости моркови и 74 °C внутри индейки.',
+  'Добавь готовую чечевицу и прогрей пару минут. Хлеб подай отдельно.',
+], ['turkey', 120], ['lentils', 67], ['carrot', 100], ['tomato', 160], ['oil', 14], ['bread', 30])
+const beefRice = meal('Говядина с рисом и перцем', [
+  'Промой рис и отвари по инструкции. Нарежь перец и кабачок полосками или кубиками.',
+  'На сковороде с указанным маслом разбей фарш лопаткой. Готовь до 71 °C внутри, добавь овощи и туши 6–10 минут до мягкости.',
+  'Выложи мясо и овощи поверх готового риса. Если суховато, подлей воду во время тушения.',
+], ['beef', 150], ['rice', 70], ['pepper', 150], ['zucchini', 100], ['oil', 5])
+const chickpeaPlate = meal('Тёплый салат с нутом и индейкой', [
+  'Нарежь картофель кубиками и отвари до мягкости. Слей жидкость с нута, промой его и прогрей вместе с картофелем.',
+  'Нарежь индейку полосками и приготовь с частью масла до 74 °C внутри.',
+  'Нарежь свежие огурец и перец. Смешай с тёплыми картофелем, нутом и индейкой. Заправь оставшимся маслом.',
+], ['turkey', 145], ['beans', 160], ['potato', 175], ['pepper', 120], ['cucumber', 100], ['oil', 12])
+const cottageSnack = meal('Творог, яблоко и орехи', [
+  'Нарежь яблоко кубиками и добавь в творог вместе с орехами. Если берёшь с собой, нарежь яблоко перед едой или съешь отдельно.',
+], ['cottage', 150], ['apple', 180], ['walnuts', 18])
+const yogurtSnack = meal('Йогурт, банан и орехи', [
+  'Положи йогурт в миску. Добавь нарезанный банан и рубленые орехи. Подсластитель в расчёт не входит.',
+], ['yogurt', 220], ['banana', 120], ['walnuts', 20])
+const kefirSnack = meal('Кефир, яблоко и тост с сыром', [
+  'Подсуши хлеб и положи на него нарезанный сыр. Кефир выпей отдельно, яблоко съешь вместе с перекусом или после.',
+], ['kefir', 250], ['apple', 170], ['bread', 45], ['cheese', 25])
+const cottageOrange = meal('Творог, апельсин и орехи', [
+  'Очисти апельсин и нарежь дольки в творог. Добавь орехи сверху. При желании съешь фрукт отдельно.',
+], ['cottage', 130], ['orange', 180], ['walnuts', 18])
+
+function breakfast(main: Meal): Meal {
+  return {
+    ...main,
+    steps: [...main.steps, 'К завтраку выпей капучино 350 мл. Для домашнего варианта вспень молоко, влей в эспрессо и дополни чашку пеной.'],
+    items: [...main.items, ['cappuccino', cappuccino.ml]],
+  }
+}
 
 export const menu = [
-  { day: 'Понедельник', short: 'Пн', meals: [oatBowl, chickenRice, cottageSnack, turkeyLentil] },
-  { day: 'Вторник', short: 'Вт', meals: [toastEgg, turkeyGrain, yogurtSnack, beefRice] },
-  { day: 'Среда', short: 'Ср', meals: [cottageBowl, beefPasta, kefirSnack, chickpeaPlate] },
-  { day: 'Четверг', short: 'Чт', meals: [oatBowl, beefRice, cottageOrange, bakedChicken] },
-  { day: 'Пятница', short: 'Пт', meals: [toastEgg, chickenRice, yogurtSnack, turkeyLentil] },
-  { day: 'Суббота', short: 'Сб', meals: [cottageBowl, turkeyGrain, kefirSnack, beefPasta] },
-  { day: 'Воскресенье', short: 'Вс', meals: [oatBowl, chickpeaPlate, cottageSnack, beefRice] },
+  { day: 'Понедельник', short: 'Пн', meals: [breakfast(oatBowl), chickenRice, cottageSnack, turkeyLentil] },
+  { day: 'Вторник', short: 'Вт', meals: [breakfast(toastEgg), turkeyGrain, yogurtSnack, beefRice] },
+  { day: 'Среда', short: 'Ср', meals: [breakfast(cottageBowl), beefPasta, kefirSnack, chickpeaPlate] },
+  { day: 'Четверг', short: 'Чт', meals: [breakfast(oatBowl), beefRice, cottageOrange, bakedChicken] },
+  { day: 'Пятница', short: 'Пт', meals: [breakfast(toastEgg), chickenRice, yogurtSnack, turkeyLentil] },
+  { day: 'Суббота', short: 'Сб', meals: [breakfast(cottageBowl), turkeyGrain, kefirSnack, beefPasta] },
+  { day: 'Воскресенье', short: 'Вс', meals: [breakfast(oatBowl), chickpeaPlate, cottageSnack, beefRice] },
 ]
 
 export const mealLabels = ['Завтрак', 'Обед', 'Перекус', 'Ужин']
 export function nutrition(items: Ingredient[]) {
-  return items.reduce((total, [id, grams]) => {
+  return items.reduce((total, [id, amount]) => {
     const { kcal, protein, fat, carbs, fiber } = foods[id]
-    const serving = grams / 100
+    const serving = amount / 100
     return {
       kcal: total.kcal + kcal * serving,
       protein: total.protein + protein * serving,
@@ -82,10 +139,10 @@ export function nutrition(items: Ingredient[]) {
 }
 
 export const shopping = Object.entries(menu.flatMap(d => d.meals).flatMap(m => m.items)
-  .reduce<Partial<Record<FoodId, number>>>((result, [id, grams]) => {
-    result[id] = (result[id] ?? 0) + grams
+  .reduce<Partial<Record<FoodId, number>>>((result, [id, amount]) => {
+    result[id] = (result[id] ?? 0) + amount
     return result
-  }, {})).map(([id, grams]) => ({ id: id as FoodId, grams, ...foods[id as FoodId] }))
+  }, {})).map(([id, amount]) => ({ id: id as FoodId, amount, ...foods[id as FoodId] }))
 
 export function targets(profile: { age: number; height: number; weight: number; sex: 'male' | 'female'; activity: number; deficit: number }) {
   const rmr = 10 * profile.weight + 6.25 * profile.height - 5 * profile.age + (profile.sex === 'male' ? 5 : -161)

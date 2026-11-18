@@ -192,7 +192,8 @@ export default function App() {
       <Suspense fallback={<div className="view panel" role="status">Загружаю раздел…</div>}>
       <div className="view" key={page}>
         {page === 'today' && <Today data={data} start={openDay} firstRun={openImport} />}
-        {page === 'training' && <Training data={data} start={openDay} setPlan={plan => update(d => ({ ...d, settings: { ...d.settings, plan } }))} />}
+        {page === 'training' && <Training data={data} start={openDay} setPlan={plan => update(d => ({ ...d, settings: { ...d.settings, plan } }))}
+          setVolume={trainingVolume => update(d => ({ ...d, settings: { ...d.settings, trainingVolume } }))} />}
         {page === 'diary' && <Diary data={data} start={openDay} update={update} />}
         {page === 'progress' && <Progress key={hash} data={data} update={update} openNew={hash === '#progress/new'} />}
         {page === 'nutrition' && <Nutrition data={data} toggle={id => update(d => ({ ...d, settings: { ...d.settings, shopping: d.settings.shopping.includes(id) ? d.settings.shopping.filter(x => x !== id) : [...d.settings.shopping, id] } }))} />}

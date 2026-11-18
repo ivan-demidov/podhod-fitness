@@ -46,6 +46,7 @@ const workoutSchema = z.object({ id, day: z.enum(dayIds), date: isoDay, updatedA
 const draftSchema = workoutSchema.extend({ exercise: z.enum(exerciseIds) })
 const settingsSchema = z.object({
   plan: z.union([z.literal(3), z.literal(4)]),
+  trainingVolume: z.enum(['auto', 'ramp', 'working']).default('auto'),
   theme: z.enum(['system', 'light', 'dark']),
   shopping: z.array(z.string()).max(100),
 })
@@ -71,7 +72,7 @@ export type Setup = z.infer<typeof setupSchema>
 export type Import = Backup | Setup
 
 export const empty: Data = {
-  version: 1, profile: null, settings: { plan: 3, theme: 'system', shopping: [] },
+  version: 1, profile: null, settings: { plan: 3, trainingVolume: 'auto', theme: 'system', shopping: [] },
   sets: [], measures: [], workouts: [], draft: null, timerEnds: 0,
 }
 const KEY = 'podhod-fitness-v1'
@@ -156,6 +157,8 @@ export function nextDay(data: Data, now = new Date()) {
   return { day, date: scheduled < localDay(now) ? localDay(now) : scheduled }
 }
 export function ramping(data: Data, today = new Date()) {
+  const volume = data.settings.trainingVolume
+  if (volume !== 'auto') return volume === 'ramp'
   const strengthDays = data.workouts.filter(w => w.day !== 'cardio' && w.day !== 'mobility').map(w => w.date).filter(day => day <= localDay(today)).sort()
   const last = strengthDays.at(-1)
   if (!last || last < localDay(dateShift(today, -13))) return true

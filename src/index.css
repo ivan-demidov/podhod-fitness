@@ -203,6 +203,9 @@ input[type=date]::-webkit-date-and-time-value { text-align: left; min-height: 1.
 .icon-link:hover { background: var(--accent); }
 
 .controls-row { margin-bottom: 15px; }
+.volume-panel { display: grid; grid-template-columns: minmax(0, 1fr) minmax(180px, max-content); gap: 12px 20px; align-items: start; margin-bottom: 14px; }
+.volume-panel p { margin-top: 5px; }
+@media (max-width: 600px) { .volume-panel { grid-template-columns: minmax(0, 1fr); } }
 .segmented {
   width: fit-content; max-width: 100%; display: inline-flex; flex-wrap: wrap; align-items: center; gap: 3px;
   padding: 4px; border: 1px solid var(--border); background: var(--muted); border-radius: 13px;
@@ -326,16 +329,24 @@ input[type=date]::-webkit-date-and-time-value { text-align: left; min-height: 1.
 .meal-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .meal-card h3 { margin-top: 7px; }
 .meal-kcal { font-size: .85rem; color: var(--muted-foreground); flex: none; }
+.coffee-note { margin-block: 10px 13px; }
+.meal-card .disclosure { margin-top: 10px; }
 .meal-card ul { list-style: none; padding: 0; margin: 9px 0 0; }
-.meal-card li { display: flex; justify-content: space-between; gap: 8px; padding: 5px 0; font-size: .86rem; border-bottom: 1px solid var(--border); }
-.meal-card li:last-child { border: none; }
-.meal-card li strong { white-space: nowrap; }
+.meal-card ul li { display: flex; justify-content: space-between; gap: 8px; padding: 5px 0; font-size: .86rem; border-bottom: 1px solid var(--border); }
+.meal-card ul li:last-child { border: none; }
+.meal-card ul li strong { white-space: nowrap; }
 .meal-grid + .caption { margin-top: 9px; }
 .shopping-group { margin-top: 16px; }
 .shopping-group h3 { margin-bottom: 4px; color: var(--chart); }
 .shopping-line { display: grid; grid-template-columns: 21px minmax(0, 1fr) auto; align-items: center; gap: 10px; min-height: 44px; border-bottom: 1px solid var(--border); cursor: pointer; }
 .shopping-line input { appearance: auto; accent-color: var(--chart); width: 18px; height: 18px; }
 .shopping-line strong { font-size: .88rem; }
+.supplement { border-top: 1px solid var(--border); padding-top: 15px; margin-top: 15px; }
+.supplement > .caption { margin-top: 3px; }
+.supplement dl { margin-top: 10px; display: grid; gap: 7px; font-size: .9rem; }
+.supplement dl > div { display: grid; grid-template-columns: minmax(85px, 25%) minmax(0, 1fr); gap: 8px; }
+.supplement dt { font-weight: 690; }
+.supplement dd { color: var(--muted-foreground); }
 .knowledge-grid .disclosure, .fitbit-panel .disclosure { margin-top: 7px; }
 .callout { background: var(--accent); padding: 10px 12px; border-radius: 11px; margin-block: 9px; font-size: .89rem; }
 .callout p { color: var(--muted-foreground); margin-top: 1px; }
