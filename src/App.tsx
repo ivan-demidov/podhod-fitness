@@ -24,7 +24,8 @@ const pages = [
   { id: 'profile', title: 'Профиль', icon: UserRound },
 ] as const
 type Page = typeof pages[number]['id']
-const currentPage = () => pages.find(p => '#' + p.id === location.hash)?.id ?? 'today'
+const pageFromHash = (hash: string) => pages.find(p => '#' + p.id === hash.split('/')[0])?.id ?? 'today'
+const currentPage = () => pageFromHash(location.hash)
 const iconPath = import.meta.env.BASE_URL + 'icon-192.png'
 
 function Brand({ close }: { close?(): void }) {
@@ -37,7 +38,8 @@ function Brand({ close }: { close?(): void }) {
 export default function App() {
   const [snapshot, setSnapshot] = useState(readData)
   const data = snapshot.data
-  const [page, setPage] = useState<Page>(currentPage)
+  const [hash, setHash] = useState(() => location.hash)
+  const page = pageFromHash(hash)
   const [flash, setFlash] = useState({ text: '', failed: false, key: 0 })
   const [online, setOnline] = useState(navigator.onLine)
   const [offlineReady, setOfflineReady] = useState(false)
@@ -53,10 +55,10 @@ export default function App() {
 
   useEffect(() => {
     function route() {
-      setPage(currentPage())
+      setHash(location.hash)
       setMenuOpen(false)
       window.scrollTo(0, 0)
-      requestAnimationFrame(() => document.getElementById('page-title')?.focus({ preventScroll: true }))
+      if (location.hash !== '#progress/new') requestAnimationFrame(() => document.getElementById('page-title')?.focus({ preventScroll: true }))
     }
     function network() { setOnline(navigator.onLine) }
     const storage = listenStorage(() => setSnapshot(readData()))
@@ -190,7 +192,7 @@ export default function App() {
         {page === 'today' && <Today data={data} start={openDay} firstRun={openImport} />}
         {page === 'training' && <Training data={data} start={openDay} setPlan={plan => update(d => ({ ...d, settings: { ...d.settings, plan } }))} />}
         {page === 'diary' && <Diary data={data} start={openDay} update={update} />}
-        {page === 'progress' && <Progress data={data} update={update} />}
+        {page === 'progress' && <Progress key={hash} data={data} update={update} openNew={hash === '#progress/new'} />}
         {page === 'nutrition' && <Nutrition data={data} toggle={id => update(d => ({ ...d, settings: { ...d.settings, shopping: d.settings.shopping.includes(id) ? d.settings.shopping.filter(x => x !== id) : [...d.settings.shopping, id] } }))} />}
         {page === 'knowledge' && <Knowledge profile={data.profile} />}
         {page === 'profile' && <ProfileView data={data} update={update} requestImport={openImport} offline={offlineReady} />}

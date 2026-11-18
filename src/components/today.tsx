@@ -20,15 +20,15 @@ export function Today({ data, start, firstRun }: { data: Data; start(day: Day): 
   return <>
     <PageHeader title={data.profile?.name ? `Привет, ${data.profile.name}` : 'Сегодня'}
       eyebrow={dateLine}
-      action={<Button asChild variant="outline" className="quick-add"><a href="#progress"><Plus aria-hidden="true" /> <span>Замер</span></a></Button>}
+      action={<Button asChild variant="outline" className="quick-add"><a href="#progress/new"><Plus aria-hidden="true" /> <span>Замер</span></a></Button>}
     />
     {!data.profile && <div className="setup-banner">
-      <div><strong>Твой план начинается здесь</strong><p>Загрузи личный файл из чата или заполни профиль вручную.</p></div>
+      <div><strong>Личный профиль</strong><p>Импортируй файл из чата или заполни данные вручную.</p></div>
       <Button variant="outline" onClick={firstRun}>Загрузить профиль<ChevronRight aria-hidden="true" /></Button>
     </div>}
     <div className="dashboard-grid">
       <section className="workout-hero" aria-label="Ближайшая тренировка" style={{ "--hero-image": `url("${import.meta.env.BASE_URL}gym.webp")` } as React.CSSProperties}>
-        <div className="hero-copy">
+        <div className="hero-copy" data-enter="">
           <p className="hero-kicker"><span className="live-dot" />{data.draft ? 'ТРЕНИРОВКА ИДЁТ' : 'СЛЕДУЮЩАЯ ТРЕНИРОВКА'}</p>
           <h2>{active.title}</h2>
           <div className="hero-meta"><span><Clock3 aria-hidden="true" /> {active.duration}</span><span><Dumbbell aria-hidden="true" /> {active.slots.length} упр.</span></div>
@@ -38,7 +38,7 @@ export function Today({ data, start, firstRun }: { data: Data; start(day: Day): 
       </section>
       <Card className="panel week-panel gap-0 shadow-none py-0">
         <div className="between"><h2>Ритм недели</h2><Dumbbell size={20} aria-hidden="true" className="muted" /></div>
-        <div className="weekly-score"><strong>{completed.length}<small> / {data.settings.plan}</small></strong><span>зал на этой неделе</span></div>
+        <div className="weekly-score"><strong>{completed.length}<small> / {data.settings.plan}</small></strong><span>тренировок в зале</span></div>
         <div className="week-track" aria-label="График силовых на неделю">
           {[1, 2, 3, 4, 5, 6, 0].map(i => {
             const filled = completed.some(w => new Date(w.date + 'T12:00:00').getDay() === i)
@@ -54,7 +54,7 @@ export function Today({ data, start, firstRun }: { data: Data; start(day: Day): 
     <section className="today-focus">
       <div className="section-bar"><h2>Ориентиры</h2></div>
       <div className="stat-grid">
-        <a className="panel stat-card" href="#progress"><Goal aria-hidden="true" /><span>Талия</span><strong>{latest?.waist ? latest.waist.toLocaleString('ru-RU') : '—'}{latest?.waist && <small> см</small>}</strong><small>{latest ? formatDay(latest.date) : 'Добавить первый замер'}</small></a>
+        <a className="panel stat-card" href={latest ? "#progress" : "#progress/new"}><Goal aria-hidden="true" /><span>Талия</span><strong>{latest?.waist ? latest.waist.toLocaleString('ru-RU') : '—'}{latest?.waist && <small> см</small>}</strong><small>{latest ? formatDay(latest.date) : 'Добавить первый замер'}</small></a>
         <a className="panel stat-card" href="#nutrition"><Utensils aria-hidden="true" /><span>Питание</span><strong>{daily ? daily.kcal.toLocaleString('ru-RU') : '—'}{daily && <small> ккал</small>}</strong><small>{daily ? `${daily.protein} г белка в день` : 'Рассчитать по профилю'}</small></a>
         <a className="panel stat-card" href="#training"><Footprints aria-hidden="true" /><span>Ходьба</span><strong>{stepBase ? stepBase.toLocaleString('ru-RU') : '10–20'}<small>{stepBase ? ' шагов' : ' мин'}</small></strong><small>{stepBase ? 'Старт по Fitbit Air' : 'Спокойный разговорный темп'}</small></a>
       </div>

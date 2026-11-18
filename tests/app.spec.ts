@@ -23,6 +23,9 @@ async function chooseFile(page: Page, name: string, value: unknown) {
 test('профиль, оба плана, семь дней меню, список покупок и источники', async ({ page }) => {
   await visit(page)
   await expect(page.getByRole('heading', { name: 'Сегодня' })).toBeVisible()
+  await page.getByRole('link', { name: 'Замер', exact: true }).click()
+  await expect(page.getByRole('dialog').getByText('Новый замер')).toBeVisible()
+  await visit(page)
   await chooseFile(page, 'setup.json', fixture)
   await page.getByRole('button', { name: 'Импортировать' }).click()
   await expect(page.getByRole('heading', { name: 'Привет, Тест' })).toBeVisible()

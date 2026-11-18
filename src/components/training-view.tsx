@@ -49,12 +49,8 @@ export function Training({ data, setPlan, start }: { data: Data; setPlan(value: 
         {plan.map((d, i) => <button key={d.id} type="button" className="day-chip" aria-pressed={selected.id === d.id} onClick={() => setDayId(d.id)}>
           <span className="day-letter">{weekdays[d.weekday]}</span><span><strong>{d.title}</strong><small>День {i + 1} · {d.duration}</small></span>
         </button>)}
-        <div className="section-bar mini"><h2>Дополнительно</h2></div>
-        {optionalDays.map(d => <button key={d.id} type="button" className="day-extra" aria-pressed={selected.id === d.id} onClick={() => setDayId(d.id)}>
-          <span>{d.title}</span><small>{d.duration}</small>
-        </button>)}
       </div>
-      <section className="panel workout-plan" aria-label={selected.title}>
+      <section className="panel workout-plan" id="day-plan" aria-label={selected.title}>
         <span className="subtle-pill"><Clock3 size={16} aria-hidden="true" /> {selected.duration}</span>
         <h2>{selected.title}</h2>
         <p>{selected.goal}</p>
@@ -68,6 +64,15 @@ export function Training({ data, setPlan, start }: { data: Data; setPlan(value: 
           </Disclosure>
         })}
         <Button onClick={() => start(selected)} className="start-plan"><Dumbbell aria-hidden="true" /> В дневник <ArrowRight aria-hidden="true" /></Button>
+      </section>
+      <section className="training-optional">
+        <div className="section-bar mini"><h2>Дополнительно</h2></div>
+        {optionalDays.map(d => <button key={d.id} type="button" className="day-extra" aria-pressed={selected.id === d.id} onClick={() => {
+          setDayId(d.id)
+          requestAnimationFrame(() => document.getElementById('day-plan')?.scrollIntoView({ block: 'start' }))
+        }}>
+          <span>{d.title}</span><small>{d.duration}</small>
+        </button>)}
       </section>
     </div>
     <section className="panel guides">

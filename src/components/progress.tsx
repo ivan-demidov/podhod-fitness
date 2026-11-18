@@ -89,9 +89,9 @@ function strengthPoints(sets: SetRecord[], id: ExerciseId) {
     .sort((a, b) => b.date.localeCompare(a.date))
 }
 
-export function Progress({ data, update }: { data: Data; update(fn: (data: Data) => Data, success?: string): boolean }) {
+export function Progress({ data, update, openNew = false }: { data: Data; update(fn: (data: Data) => Data, success?: string): boolean; openNew?: boolean }) {
   const [metric, setMetric] = useState<Metric>('weight')
-  const [editing, setEditing] = useState<Measure | 'new' | null>(null)
+  const [editing, setEditing] = useState<Measure | 'new' | null>(openNew ? 'new' : null)
   const [selected, setSelected] = useState<ExerciseId>('bench')
   const records = newest(data.measures)
   const exerciseIds = Array.from(new Set(newest(data.sets).map(s => s.ex)))

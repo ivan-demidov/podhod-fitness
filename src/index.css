@@ -121,7 +121,7 @@ input[type=date]::-webkit-date-and-time-value { text-align: left; min-height: 1.
 .mobile-head, .mobile-tabs { display: none; }
 .main { min-height: 100dvh; margin-left: var(--sidebar-width); padding: 49px 36px 55px; }
 .view, .network-status, .warning-banner { max-width: 1100px; margin-inline: auto; }
-.page-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 25px; }
+.page-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 27px; }
 .page-header h1 { font-size: clamp(2rem, 5vw, 3.37rem); line-height: 1.06; letter-spacing: -.063em; font-weight: 760; overflow-wrap: anywhere; }
 .page-description { color: var(--muted-foreground); margin-top: 9px; max-width: 590px; }
 .eyebrow { text-transform: uppercase; font-size: .73rem; color: var(--chart); font-weight: 760; letter-spacing: .095em; line-height: 1.4; }
@@ -157,6 +157,8 @@ input[type=date]::-webkit-date-and-time-value { text-align: left; min-height: 1.
   background: linear-gradient(90deg, #111910bd, #1923194a 65%, #11190d1f), var(--hero-image) center 59% / cover #242d22;
 }
 .hero-copy { max-width: 100%; }
+.hero-copy[data-enter] { animation: hero-enter .3s ease-out both; }
+@keyframes hero-enter { from { opacity: .78; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 .hero-kicker { font-size: .71rem; letter-spacing: .13em; color: #e5f2c1; font-weight: 750; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
 .live-dot { background: #d7f097; }
 .workout-hero h2 { font-size: clamp(1.9rem, 3.7vw, 3.1rem); font-weight: 720; line-height: 1.04; letter-spacing: -.054em; max-width: 13ch; overflow-wrap: anywhere; }
@@ -168,8 +170,8 @@ input[type=date]::-webkit-date-and-time-value { text-align: left; min-height: 1.
 .hero-button[data-slot=button]:hover { background: #e5f6be; }
 .week-panel { display: flex; flex-direction: column; }
 .weekly-score { margin: auto 0 15px; padding-top: 15px; display: grid; gap: 1px; }
-.weekly-score strong { font-size: 3.15rem; font-weight: 710; font-variant-numeric: tabular-nums; line-height: 1.05; letter-spacing: -.07em; }
-.weekly-score strong small { font-size: 1.62rem; color: var(--muted-foreground); letter-spacing: -.06em; }
+.weekly-score strong { font-size: 2.85rem; font-weight: 710; font-variant-numeric: tabular-nums; line-height: 1.05; letter-spacing: -.07em; }
+.weekly-score strong small { font-size: 1.22rem; color: var(--muted-foreground); letter-spacing: -.06em; }
 .weekly-score > span { color: var(--muted-foreground); font-size: .87rem; }
 .week-track { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
 .week-day { text-align: center; color: var(--muted-foreground); font-size: .75rem; font-weight: 630; display: grid; gap: 5px; justify-items: center; }
@@ -184,7 +186,10 @@ input[type=date]::-webkit-date-and-time-value { text-align: left; min-height: 1.
 .today-focus { margin-top: 25px; }
 .stat-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
 .stat-card { display: grid; gap: 4px; text-decoration: none; align-content: start; padding-block: 18px; }
-.stat-card:hover { border-color: var(--ring); }
+@media (hover: hover) and (pointer: fine) {
+  .stat-card { transition: transform .16s ease-out, border-color .16s ease-out; }
+  .stat-card:hover { border-color: var(--ring); transform: translateY(-2px); }
+}
 .stat-card svg { color: var(--chart); width: 19px; height: 19px; margin-bottom: 4px; }
 .stat-card > span { font-size: .86rem; font-weight: 660; }
 .stat-card > strong { font-size: clamp(1.45rem, 3vw, 2.15rem); font-weight: 740; line-height: 1.1; letter-spacing: -.05em; font-variant-numeric: tabular-nums; }
@@ -206,8 +211,10 @@ input[type=date]::-webkit-date-and-time-value { text-align: left; min-height: 1.
 .segmented button[aria-pressed=true] { background: var(--card); box-shadow: 0 1px 2px #00000016; color: var(--foreground); }
 .subtle-pill { display: inline-flex; align-items: center; width: fit-content; max-width: 100%; gap: 5px; padding: 5px 9px; background: var(--accent); color: var(--accent-foreground); border-radius: 10px; font-size: .78rem; font-weight: 650; line-height: 1.3; }
 .subtle-pill svg { flex: none; }
-.training-layout { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.6fr); align-items: start; gap: 17px; }
-.training-days { display: grid; gap: 8px; min-width: 0; }
+.training-layout { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.6fr); align-items: start; grid-template-areas: "days plan" "optional plan"; grid-template-rows: auto 1fr; gap: 14px 17px; }
+.training-days { grid-area: days; display: grid; gap: 8px; min-width: 0; }
+.training-optional { grid-area: optional; display: grid; gap: 8px; }
+.workout-plan { grid-area: plan; scroll-margin-top: 14px; }
 .day-chip, .day-extra {
   display: flex; align-items: center; gap: 10px; text-align: left; min-height: 55px; min-width: 0; padding: 8px 10px;
   border: 1px solid var(--border); border-radius: 13px; background: var(--card);
@@ -381,18 +388,22 @@ input[type=date]::-webkit-date-and-time-value { text-align: left; min-height: 1.
   .page-header .eyebrow { margin-bottom: 5px; }
   .page-header h1 { font-size: clamp(2.08rem, 9vw, 3.1rem); }
   .page-description { font-size: .92rem; line-height: 1.49; margin-top: 6px; }
-  .setup-banner { align-items: flex-start; flex-direction: column; gap: 8px; }
+  .setup-banner { gap: 9px; padding: 10px 11px; }
+  .setup-banner p { font-size: .78rem; }
+  .setup-banner > [data-slot=button] { flex: none; max-width: 46%; text-align: left; font-size: .8rem; }
   .workout-hero { min-height: 290px; background-position: center, 55% center; }
   .workout-hero h2 { font-size: clamp(1.85rem, 8vw, 3.05rem); }
   .dashboard-grid, .training-layout, .diary-layout, .progress-grid, .profile-grid, .knowledge-grid { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .training-layout { grid-template-areas: "days" "plan" "optional"; grid-template-rows: auto; }
   .training-days { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .training-days .mini { grid-column: 1 / -1; }
+  .training-optional { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .training-optional .mini { grid-column: 1 / -1; }
   .day-chip { align-items: flex-start; gap: 7px; }
   .day-letter { width: 28px; height: 29px; }
   .day-extra { align-content: center; gap: 2px; }
   .week-panel { padding-top: 14px; padding-bottom: 10px; }
   .weekly-score { padding-top: 9px; margin-bottom: 9px; }
-  .weekly-score strong { font-size: 2.5rem; }
+  .weekly-score strong { font-size: 2.2rem; }
   .week-track { gap: 5px; }
   .today-focus { margin-top: 17px; }
   .stat-grid { gap: 7px; }
